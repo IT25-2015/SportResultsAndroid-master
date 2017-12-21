@@ -1,0 +1,119 @@
+apply plugin: 'com.android.application'
+apply plugin: 'me.tatarka.retrolambda'
+apply from: '../config/quality.gradle'
+
+retrolambda {
+    javaVersion JavaVersion.VERSION_1_7
+    defaultMethods false
+    incremental true
+}
+
+android {
+    compileSdkVersion 25
+    buildToolsVersion '25.0.2'
+    defaultConfig {
+        applicationId "com.angelkjoseski.live_results"
+        minSdkVersion 21
+        targetSdkVersion 25
+        versionCode 1
+        versionName "1.0"
+
+        vectorDrawables.useSupportLibrary = true
+
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        debug {
+            minifyEnabled false
+
+            buildConfigField "String", "SERVER_URL", '"https://angelkjos.github.io/test/unwire/"'
+        }
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+
+            buildConfigField "String", "SERVER_URL", '"https://angelkjos.github.io/test/unwire/"'
+        }
+    }
+
+    lintOptions {
+        ignore 'InvalidPackage', 'UseCompoundDrawables', 'GoogleAppIndexingWarning', 'ContentDescription'
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+}
+
+ext {
+    supportLibVersion = '25.3.1'
+    butterknifeLibVersion = '8.5.1'
+    retrofitLibVersion = '2.2.0'
+    okHttpLibVersion = '3.6.0'
+    rxJavaLibVersion = '2.0.1'
+    stethoLibVersion = '1.4.2'
+    daggerLibVersion = '2.10'
+    gsonLibVersion = '2.7'
+    glideLibVersion = '3.7.0'
+}
+
+dependencies {
+    // Local JARs
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+
+    // Google libraries
+    compile "com.android.support:appcompat-v7:${supportLibVersion}"
+    compile "com.android.support:design:${supportLibVersion}"
+    compile "com.android.support:recyclerview-v7:${supportLibVersion}"
+    compile "com.android.support:support-vector-drawable:${supportLibVersion}"
+
+    // UI libraries
+    compile "com.jakewharton:butterknife:${butterknifeLibVersion}"
+    annotationProcessor "com.jakewharton:butterknife-compiler:${butterknifeLibVersion}"
+    compile "com.github.bumptech.glide:glide:${glideLibVersion}"
+
+    // Network libraries
+    compile "com.squareup.retrofit2:retrofit:${retrofitLibVersion}"
+    compile "com.squareup.retrofit2:adapter-rxjava2:${retrofitLibVersion}"
+    compile "com.squareup.retrofit2:converter-gson:${retrofitLibVersion}"
+    compile "com.squareup.okhttp3:okhttp:${okHttpLibVersion}"
+    compile "com.squareup.okhttp3:logging-interceptor:${okHttpLibVersion}"
+    compile "io.reactivex.rxjava2:rxandroid:${rxJavaLibVersion}"
+    compile "io.reactivex.rxjava2:rxjava:${rxJavaLibVersion}"
+    compile "com.google.code.gson:gson:${gsonLibVersion}"
+    compile "com.facebook.stetho:stetho:${stethoLibVersion}"
+    compile "com.facebook.stetho:stetho-okhttp3:${stethoLibVersion}"
+
+    // Dependency-Injection
+    compile 'javax.inject:javax.inject:1'
+    compile 'org.glassfish:javax.annotation:10.0-b28'
+    compile "com.google.dagger:dagger:${daggerLibVersion}"
+    annotationProcessor "com.google.dagger:dagger-compiler:${daggerLibVersion}"
+
+    // Testing dependencies
+    testCompile 'junit:junit:4.12'
+
+    testCompile 'org.robolectric:robolectric:3.0'
+    testCompile('org.robolectric:shadows-core:3.0')
+    testCompile('org.robolectric:shadows-support-v4:3.0') {
+        exclude module: 'support-v4'
+    }
+
+    testAnnotationProcessor "com.google.dagger:dagger-compiler:${daggerLibVersion}"
+    testCompile "com.squareup.okhttp3:okhttp:${okHttpLibVersion}"
+    testCompile "com.squareup.okhttp3:mockwebserver:${okHttpLibVersion}"
+    testCompile 'com.squareup.assertj:assertj-android:1.1.1'
+    testCompile 'org.mockito:mockito-core:1.10.19'
+    testCompile "com.android.support:support-annotations:${supportLibVersion}"
+
+    androidTestAnnotationProcessor "com.google.dagger:dagger-compiler:${daggerLibVersion}"
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+}
+
+//Runs checkstyle on each compile.
+android.applicationVariants.all { variant ->
+    variant.preBuild.dependsOn "checkstyle"
+}
